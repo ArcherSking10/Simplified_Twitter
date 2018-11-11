@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<h3>Username: {{.User}}</h3>
+	<form action={{.URL}} method="post">
+	  <input type="radio" name="relation" value="follow"> Follow<br>
+	  <input type="radio" name="relation" value="unfollow"> Unfollow<br>
+	  <input type="submit" value="confirm">
+	</form>
+</body>
+</html>
