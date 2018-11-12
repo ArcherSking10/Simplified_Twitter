@@ -91,13 +91,21 @@ func twitter(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, curUser)
 	case "POST":
 		r.ParseForm()
-		// Put the posts in the Login user's post
-		curUser.Posts = append(curUser.Posts, r.Form.Get("contents"))
-		// Update the infomation in storage
-		storage.WebDB.UpdateUser(uName, curUser)
-		// storage.WebDB.UsersInfo[uName] = curUser
-		fmt.Println("Posts", curUser.Posts)
-		http.Redirect(w, r, r.URL.Path, 302)
+        submitType := r.Form.Get("submit")
+        fmt.Println(submitType)
+        switch submitType {
+        case "logout":
+        	auth.ClearSession(w)
+			http.Redirect(w, r, "/", 302)
+        case "twit":
+			// Put the posts in the Login user's post
+			curUser.Posts = append(curUser.Posts, r.Form.Get("contents"))
+			// Update the infomation in storage
+			storage.WebDB.UpdateUser(uName, curUser)
+			// storage.WebDB.UsersInfo[uName] = curUser
+			fmt.Println("Posts", curUser.Posts)
+			http.Redirect(w, r, r.URL.Path, 302)
+        }
 	}
 
 }

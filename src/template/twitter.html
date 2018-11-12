@@ -8,11 +8,16 @@
         {{range .Posts}}
         <h3>{{.}}</h3>
         {{end}}
+        <div>---------------------------</div>
         <h2>Post Contents</h2>
         <form method="Post">
             contents:<input type="text" name="contents">
-            <input type="submit" name="submit">
+            <input type="submit" value="twit" name="submit">
         </form>
-
+        <div>---------------------------</div>
+        <h3>Log out</h3>
+        <form method="Post">
+            <input type="submit" value="logout" name="submit">
+        </form>
     </body>
 </html>

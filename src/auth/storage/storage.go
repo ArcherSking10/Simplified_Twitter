@@ -6,7 +6,7 @@ type User struct {
 	UserName  string
 	passWord  string
 	Posts     []string
-	following []string
+	Following []string
 }
 
 type DB struct {
@@ -40,8 +40,12 @@ func (db *DB) HasUser(uName string, pWord string) bool {
 		return false
 	}
 	// Check Whether User in usersInfo
-	_, exist := db.UsersInfo[uName]
-	return exist
+	user, exist := db.UsersInfo[uName]
+	if exist && user.passWord == pWord{
+		return true
+	} 
+	return false
+	
 }
 
 func init() {
