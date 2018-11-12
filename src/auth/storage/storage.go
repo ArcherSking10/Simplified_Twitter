@@ -1,17 +1,17 @@
 package storage
 
-
 var WebDB DB
 
-type User struct {  
-    userName   string
-    passWord   string
-    posts     []string
-    following []string
+type User struct {
+	UserName  string
+	passWord  string
+	Posts     []string
+	following []string
 }
 
 type DB struct {
-	usersInfo [] User
+	// usersInfo []User
+	UsersInfo map[string]User
 }
 
 func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
@@ -21,23 +21,22 @@ func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
 	if uName == "" || pWord1 == "" {
 		return false
 	}
-	curUser := User {uName, pWord1, []string{}, []string{}}
-	db.usersInfo = append(db.usersInfo, curUser)
+	curUser := User{uName, pWord1, []string{}, []string{}}
+	// Use uName as key put curUser inside
+	db.UsersInfo[uName] = curUser
 	return true
 }
 
 func (db *DB) HasUser(uName string, pWord string) bool {
-	if (uName == "" || pWord == "") {
+	if uName == "" || pWord == "" {
 		return false
 	}
-    for _, user := range db.usersInfo {
-        if (uName == user.userName && pWord == user.passWord) {
-        	return true
-        }
-    }
-	return false
+	// Check Whether User in usersInfo
+	_, exist := db.UsersInfo[uName]
+	return exist
 }
 
 func init() {
-	WebDB = DB {}
+	m := make(map[string]User)
+	WebDB = DB{UsersInfo: m}
 }
