@@ -10,8 +10,11 @@ type User struct {
 }
 
 type DB struct {
-	// usersInfo []User
 	UsersInfo map[string]User
+}
+
+func (db *DB) GetUser(uName string) User {
+	return db.UsersInfo[uName]
 }
 
 func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
@@ -24,6 +27,11 @@ func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
 	curUser := User{uName, pWord1, []string{}, []string{}}
 	// Use uName as key put curUser inside
 	db.UsersInfo[uName] = curUser
+	return true
+}
+
+func (db *DB) UpdateUser(uName string, usr User) bool {
+	db.UsersInfo[uName] = usr
 	return true
 }
 
