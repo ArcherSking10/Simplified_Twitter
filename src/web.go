@@ -14,17 +14,14 @@ type MyMux struct {
 func (p *MyMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.URL.Path)
 	if r.URL.Path == "/" {
-		fmt.Println("in1")
 		// Go to main page
 		indexPage(w, r)
 	} else {
-		fmt.Println("in2")
 		uName := auth.GetUserName(r)
 		// If uName is in COOKIE,which means the user is login
 		// so the username will be returned
 		if uName != "" {
 			twitter(w, r)
-			fmt.Println("User")
 		} else {
 			// If user not in COOKIE, the user is not login
 			// Then return to the main page
@@ -88,24 +85,32 @@ func twitter(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Error : %v\n", err)
 			return
 		}
-		t.Execute(w, curUser)
+		pageContent := storage.WebDB.GetTwitterPage(uName)
+		t.Execute(w, pageContent)
 	case "POST":
 		r.ParseForm()
         submitType := r.Form.Get("submit")
         fmt.Println(submitType)
+        redirectUrl := r.URL.Path
         switch submitType {
-        case "logout":
-        	auth.ClearSession(w)
-			http.Redirect(w, r, "/", 302)
+        case "follow":
+        	person := r.Form.Get("unfollow")
+        	storage.WebDB.FollowUser(uName, person)
+        case "unfollow":
+        	person := r.Form.Get("following")
+        	storage.WebDB.UnFollowUser(uName, person)
         case "twit":
 			// Put the posts in the Login user's post
-			curUser.Posts = append(curUser.Posts, r.Form.Get("contents"))
+			curUser.Posts = append(curUser.Posts, r.Form.Get("contents")) // TODO
 			// Update the infomation in storage
 			storage.WebDB.UpdateUser(uName, curUser)
 			// storage.WebDB.UsersInfo[uName] = curUser
 			fmt.Println("Posts", curUser.Posts)
-			http.Redirect(w, r, r.URL.Path, 302)
+        case "logout":
+        	auth.ClearSession(w)
+        	redirectUrl = "/"
         }
+        http.Redirect(w, r, redirectUrl, 302)
 	}
 
 }

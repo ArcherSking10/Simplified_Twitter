@@ -4,9 +4,27 @@
     </head>
     <body>
         <h2>Profile:  {{.UserName}}</h2>
+        <h2>Recommend follower</h2>
+        {{range .UnFollowed}}
+        <h4>{{.}}</h4>
+        <form method="Post">
+          <input type="hidden" value={{.}} name="unfollow">
+          <input type="submit" value="follow" name="submit">
+        </form>
+        {{end}}
+
+        <h2>Following</h2>
+        {{range .Following}}
+        <h4>{{.}}</h4>
+        <form method="Post">
+          <input type="hidden" value={{.}} name="following">
+          <input type="submit" value="unfollow" name="submit">
+        </form>
+        {{end}}
+
         <h2>Contents Display</h2>
         {{range .Posts}}
-        <h3>{{.}}</h3>
+        <h4>{{.}}</h4>
         {{end}}
         <div>---------------------------</div>
         <h2>Post Contents</h2>
@@ -14,6 +32,7 @@
             contents:<input type="text" name="contents">
             <input type="submit" value="twit" name="submit">
         </form>
+
         <div>---------------------------</div>
         <h3>Log out</h3>
         <form method="Post">
