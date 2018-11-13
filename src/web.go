@@ -89,28 +89,28 @@ func twitter(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, pageContent)
 	case "POST":
 		r.ParseForm()
-        submitType := r.Form.Get("submit")
-        fmt.Println(submitType)
-        redirectUrl := r.URL.Path
-        switch submitType {
-        case "follow":
-        	person := r.Form.Get("unfollow")
-        	storage.WebDB.FollowUser(uName, person)
-        case "unfollow":
-        	person := r.Form.Get("following")
-        	storage.WebDB.UnFollowUser(uName, person)
-        case "twit":
+		submitType := r.Form.Get("submit")
+		fmt.Println(submitType)
+		redirectUrl := r.URL.Path
+		switch submitType {
+		case "follow":
+			person := r.Form.Get("unfollow")
+			storage.WebDB.FollowUser(uName, person)
+		case "unfollow":
+			person := r.Form.Get("following")
+			storage.WebDB.UnFollowUser(uName, person)
+		case "twit":
 			// Put the posts in the Login user's post
 			curUser.Posts = append(curUser.Posts, r.Form.Get("contents")) // TODO
 			// Update the infomation in storage
 			storage.WebDB.UpdateUser(uName, curUser)
 			// storage.WebDB.UsersInfo[uName] = curUser
 			fmt.Println("Posts", curUser.Posts)
-        case "logout":
-        	auth.ClearSession(w)
-        	redirectUrl = "/"
-        }
-        http.Redirect(w, r, redirectUrl, 302)
+		case "logout":
+			auth.ClearSession(w)
+			redirectUrl = "/"
+		}
+		http.Redirect(w, r, redirectUrl, 302)
 	}
 
 }

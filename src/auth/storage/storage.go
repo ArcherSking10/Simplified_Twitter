@@ -14,7 +14,7 @@ type User struct {
 }
 
 type TwitterPage struct {
-	UserName     string
+	UserName   string
 	UnFollowed []string
 	Following  []string
 	Posts      []string
@@ -52,29 +52,29 @@ func (db *DB) HasUser(uName string, pWord string) bool {
 	}
 	// Check Whether User in usersInfo
 	user, exist := db.UsersInfo[uName]
-	if exist && user.passWord == pWord{
+	if exist && user.passWord == pWord {
 		return true
-	} 
+	}
 	return false
 }
 
 func Contains(a []string, x string) bool {
-    for _, n := range a {
-        if x == n {
-            return true
-        }
-    }
-    return false
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
 }
 
 func Deletes(a []string, x string) []string {
 	var ret []string
-    for _, n := range a {
-        if x != n {
-            ret = append(ret, x)
-        }
-    }
-    return ret
+	for _, n := range a {
+		if x != n {
+			ret = append(ret, n)
+		}
+	}
+	return ret
 }
 
 func (db *DB) FollowUser(uName string, otherName string) bool {
@@ -89,7 +89,7 @@ func (db *DB) FollowUser(uName string, otherName string) bool {
 
 func (db *DB) UnFollowUser(uName string, otherName string) bool {
 	user, _ := db.UsersInfo[uName]
-	if ! Contains(user.Following, otherName) {
+	if !Contains(user.Following, otherName) {
 		return false
 	}
 	user.Following = Deletes(user.Following, otherName)
@@ -113,7 +113,9 @@ func (db *DB) GetTwitterPage(uName string) TwitterPage {
 		}
 	}
 	fmt.Println(Posts)
-	pg := TwitterPage{UserName : UserName, Following : Following, UnFollowed : UnFollowed, Posts : Posts}
+	Following = Deletes(Following, uName)
+	fmt.Println("-------->", Following)
+	pg := TwitterPage{UserName: UserName, Following: Following, UnFollowed: UnFollowed, Posts: Posts}
 	return pg
 }
 
