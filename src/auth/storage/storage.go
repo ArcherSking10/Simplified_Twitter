@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 )
 
@@ -20,7 +21,11 @@ type User struct {
 	Following []string
 }
 
+// Define this type for sort
 type Twitlist []TwitPosts
+
+// Using time to define post order
+// Username to who do the posts
 
 type TwitPosts struct {
 	Contents string
@@ -32,14 +37,15 @@ type TwitterPage struct {
 	UserName   string
 	UnFollowed []string
 	Following  []string
-	// Posts      []string
-	Posts Twitlist
+	Posts      []string
+	// Posts Twitlist
 }
 
 type DB struct {
 	UsersInfo map[string]User
 }
 
+// Sort Function needed these three Function
 func (I Twitlist) Len() int {
 	return len(I)
 }
@@ -49,6 +55,7 @@ func (I Twitlist) Less(i, j int) bool {
 func (I Twitlist) Swap(i, j int) {
 	I[i], I[j] = I[j], I[i]
 }
+
 func (db *DB) GetUser(uName string) User {
 	return db.UsersInfo[uName]
 }
@@ -122,20 +129,25 @@ func (db *DB) UnFollowUser(uName string, otherName string) bool {
 	return true
 }
 
-// func GetContents(arr Twitlist) []string {
-// 	var ret []string
-// 	for _, twit := range arr {
-// 		tmp := twit.User + ": " + twit.Contents
-// 		ret = append(ret, tmp)
-// 	}
-// 	return ret
-// }
+// Get Rid of the arrtribute of time
+// Just leave username + contents
+
+func GetContents(arr Twitlist) []string {
+	var ret []string
+	for _, twit := range arr {
+		tmp := twit.User + ": " + twit.Contents
+		ret = append(ret, tmp)
+	}
+	return ret
+}
+
 func (db *DB) GetTwitterPage(uName string) TwitterPage {
 	user, _ := db.UsersInfo[uName]
 	UserName := user.UserName
 	Following := user.Following
 	var UnFollowed []string
 	var Posts Twitlist
+	// Get all Posts information
 	for name, userInfo := range db.UsersInfo {
 		if Contains(Following, name) {
 			for _, post := range userInfo.Posts {
@@ -146,11 +158,13 @@ func (db *DB) GetTwitterPage(uName string) TwitterPage {
 		}
 	}
 	fmt.Println(Posts)
-	// Posts = GetContents(Posts)
 	sort.Sort(Posts)
+	fmt.Println("Type ------>", reflect.TypeOf(Posts))
+	newPosts := GetContents(Posts)
+	// Remove the user itself from following list (just not shown in screen but in memory)
 	Following = Deletes(Following, uName)
 	fmt.Println("-------->", Posts)
-	pg := TwitterPage{UserName: UserName, Following: Following, UnFollowed: UnFollowed, Posts: Posts}
+	pg := TwitterPage{UserName: UserName, Following: Following, UnFollowed: UnFollowed, Posts: newPosts}
 	return pg
 }
 
