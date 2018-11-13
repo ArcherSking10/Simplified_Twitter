@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 )
 
 type MyMux struct {
@@ -101,7 +102,11 @@ func twitter(w http.ResponseWriter, r *http.Request) {
 			storage.WebDB.UnFollowUser(uName, person)
 		case "twit":
 			// Put the posts in the Login user's post
-			curUser.Posts = append(curUser.Posts, r.Form.Get("contents")) // TODO
+			var curTwit storage.TwitPosts
+			curTwit.Contents = r.Form.Get("contents")
+			curTwit.Date = time.Now().Unix()
+			curTwit.User = uName
+			curUser.Posts = append(curUser.Posts, curTwit) // TODO
 			// Update the infomation in storage
 			storage.WebDB.UpdateUser(uName, curUser)
 			// storage.WebDB.UsersInfo[uName] = curUser

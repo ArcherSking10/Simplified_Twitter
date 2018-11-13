@@ -2,28 +2,53 @@ package storage
 
 import (
 	"fmt"
+	"sort"
 )
 
 var WebDB DB
 
+// type TwitPosts struct {
+// 	Posts    []string
+// 	Date     string
+// 	Username string
+// }
 type User struct {
-	UserName  string
-	passWord  string
-	Posts     []string
+	UserName string
+	passWord string
+	// Posts     []TwitPosts
+	Posts     Twitlist
 	Following []string
+}
+
+type Twitlist []TwitPosts
+
+type TwitPosts struct {
+	Contents string
+	Date     int64
+	User     string
 }
 
 type TwitterPage struct {
 	UserName   string
 	UnFollowed []string
 	Following  []string
-	Posts      []string
+	// Posts      []string
+	Posts Twitlist
 }
 
 type DB struct {
 	UsersInfo map[string]User
 }
 
+func (I Twitlist) Len() int {
+	return len(I)
+}
+func (I Twitlist) Less(i, j int) bool {
+	return I[i].Date < I[j].Date
+}
+func (I Twitlist) Swap(i, j int) {
+	I[i], I[j] = I[j], I[i]
+}
 func (db *DB) GetUser(uName string) User {
 	return db.UsersInfo[uName]
 }
@@ -35,7 +60,7 @@ func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
 	if uName == "" || pWord1 == "" {
 		return false
 	}
-	curUser := User{uName, pWord1, []string{}, []string{uName}}
+	curUser := User{uName, pWord1, Twitlist{}, []string{uName}}
 	// Use uName as key put curUser inside
 	db.UsersInfo[uName] = curUser
 	return true
@@ -97,12 +122,20 @@ func (db *DB) UnFollowUser(uName string, otherName string) bool {
 	return true
 }
 
+// func GetContents(arr Twitlist) []string {
+// 	var ret []string
+// 	for _, twit := range arr {
+// 		tmp := twit.User + ": " + twit.Contents
+// 		ret = append(ret, tmp)
+// 	}
+// 	return ret
+// }
 func (db *DB) GetTwitterPage(uName string) TwitterPage {
 	user, _ := db.UsersInfo[uName]
 	UserName := user.UserName
 	Following := user.Following
 	var UnFollowed []string
-	var Posts []string
+	var Posts Twitlist
 	for name, userInfo := range db.UsersInfo {
 		if Contains(Following, name) {
 			for _, post := range userInfo.Posts {
@@ -113,8 +146,10 @@ func (db *DB) GetTwitterPage(uName string) TwitterPage {
 		}
 	}
 	fmt.Println(Posts)
+	// Posts = GetContents(Posts)
+	sort.Sort(Posts)
 	Following = Deletes(Following, uName)
-	fmt.Println("-------->", Following)
+	fmt.Println("-------->", Posts)
 	pg := TwitterPage{UserName: UserName, Following: Following, UnFollowed: UnFollowed, Posts: Posts}
 	return pg
 }
