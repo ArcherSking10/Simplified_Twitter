@@ -1,4 +1,4 @@
-package auth
+package cookie
 
 import (
 	// "fmt"
@@ -24,7 +24,7 @@ func GetUserName(request *http.Request) (userName string) {
 }
 
 func SetSession(userName string, response http.ResponseWriter) {
-	value := map[string]string {
+	value := map[string]string{
 		"name": userName,
 	}
 	if encoded, err := cookieHandler.Encode("session", value); err == nil {
@@ -46,4 +46,3 @@ func ClearSession(response http.ResponseWriter) {
 	}
 	http.SetCookie(response, cookie)
 }
-
