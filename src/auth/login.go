@@ -1,14 +1,14 @@
-package handler
+package auth
 
 import (
 	"auth/cookie"
-	"auth/storage"
+	"storage"
 	"fmt"
 	"html/template"
 	"net/http"
 )
 
-func Auth(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method : ", r.Method)
 	switch r.Method {
 	case "GET":

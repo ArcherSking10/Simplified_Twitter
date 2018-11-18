@@ -1,15 +1,15 @@
-package handler
+package profile
 
 import (
 	"auth/cookie"
-	"auth/storage"
+	"storage"
 	"fmt"
 	"html/template"
 	"net/http"
 	// "time"
 )
 
-func UserPage(w http.ResponseWriter, r *http.Request) {
+func Profile(w http.ResponseWriter, r *http.Request) {
 	// First Get Login username
 	uName := cookie.GetUserName(r)
 	if uName != "" {

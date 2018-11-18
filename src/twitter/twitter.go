@@ -1,15 +1,15 @@
-package handler
+package twitter
 
 import (
 	"auth/cookie"
-	"auth/storage"
+	"storage"
 	"fmt"
 	"html/template"
 	"net/http"
 	"time"
 )
 
-func Twit(w http.ResponseWriter, r *http.Request) {
+func Twitter(w http.ResponseWriter, r *http.Request) {
 	uName := cookie.GetUserName(r)
 	fmt.Println("twit --------->")
 	if uName != "" {

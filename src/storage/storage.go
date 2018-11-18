@@ -8,15 +8,10 @@ import (
 
 var WebDB DB
 
-// type TwitPosts struct {
-// 	Posts    []string
-// 	Date     string
-// 	Username string
-// }
+
 type User struct {
 	UserName string
 	passWord string
-	// Posts     []TwitPosts
 	Posts     Twitlist
 	Following []string
 }
@@ -68,12 +63,18 @@ func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
 		return false
 	}
 	curUser := User{uName, pWord1, Twitlist{}, []string{uName}}
+	if _, ok := db.UsersInfo[uName]; ok {
+		return false
+	}
 	// Use uName as key put curUser inside
 	db.UsersInfo[uName] = curUser
 	return true
 }
 
 func (db *DB) UpdateUser(uName string, usr User) bool {
+	if _, ok := db.UsersInfo[uName]; ok != true {
+		return false
+	}
 	db.UsersInfo[uName] = usr
 	return true
 }

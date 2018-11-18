@@ -2,14 +2,16 @@ package main
 
 import (
 	// "fmt"
-	"handler"
+	"auth"
+	"profile"
+	"twitter"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/", handler.Auth)
-	http.HandleFunc("/profile", handler.UserPage)
-	http.HandleFunc("/profile/post", handler.Twit)
-	http.HandleFunc("/logout", handler.Logout)
+	http.HandleFunc("/", auth.Login)
+	http.HandleFunc("/profile", profile.Profile)
+	http.HandleFunc("/profile/post", twitter.Twitter)
+	http.HandleFunc("/logout", auth.Logout)
 	http.ListenAndServe(":9090", nil)
 }
