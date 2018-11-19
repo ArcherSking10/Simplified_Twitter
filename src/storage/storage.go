@@ -2,16 +2,15 @@ package storage
 
 import (
 	"fmt"
-	"reflect"
 	"sort"
+	"sync"
 )
 
 var WebDB DB
 
-
 type User struct {
-	UserName string
-	passWord string
+	UserName  string
+	passWord  string
 	Posts     Twitlist
 	Following []string
 }
@@ -37,6 +36,7 @@ type TwitterPage struct {
 }
 
 type DB struct {
+	mu        sync.Mutex
 	UsersInfo map[string]User
 }
 
@@ -52,10 +52,14 @@ func (I Twitlist) Swap(i, j int) {
 }
 
 func (db *DB) GetUser(uName string) User {
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	return db.UsersInfo[uName]
 }
 
 func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	if pWord1 != pWord2 {
 		return false
 	}
@@ -72,6 +76,8 @@ func (db *DB) AddUser(uName string, pWord1 string, pWord2 string) bool {
 }
 
 func (db *DB) UpdateUser(uName string, usr User) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	if _, ok := db.UsersInfo[uName]; ok != true {
 		return false
 	}
@@ -80,6 +86,8 @@ func (db *DB) UpdateUser(uName string, usr User) bool {
 }
 
 func (db *DB) HasUser(uName string, pWord string) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	if uName == "" || pWord == "" {
 		return false
 	}
@@ -111,23 +119,31 @@ func Deletes(a []string, x string) []string {
 }
 
 func (db *DB) FollowUser(uName string, otherName string) bool {
-	user, _ := db.UsersInfo[uName]
-	if Contains(user.Following, otherName) {
-		return false
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	if user, ok := db.UsersInfo[uName]; ok {
+		if Contains(user.Following, otherName) {
+			return false
+		}
+		user.Following = append(user.Following, otherName)
+		db.UsersInfo[uName] = user
+		return true
 	}
-	user.Following = append(user.Following, otherName)
-	db.UpdateUser(uName, user)
-	return true
+	return false
 }
 
 func (db *DB) UnFollowUser(uName string, otherName string) bool {
-	user, _ := db.UsersInfo[uName]
-	if !Contains(user.Following, otherName) {
-		return false
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	if user, ok := db.UsersInfo[uName]; ok {
+		if !Contains(user.Following, otherName) {
+			return false
+		}
+		user.Following = Deletes(user.Following, otherName)
+		db.UsersInfo[uName] = user
+		return true
 	}
-	user.Following = Deletes(user.Following, otherName)
-	db.UpdateUser(uName, user)
-	return true
+	return false
 }
 
 // Get Rid of the arrtribute of time
@@ -143,6 +159,8 @@ func GetContents(arr Twitlist) []string {
 }
 
 func (db *DB) GetTwitterPage(uName string) TwitterPage {
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	user, _ := db.UsersInfo[uName]
 	UserName := user.UserName
 	Following := user.Following
@@ -160,11 +178,9 @@ func (db *DB) GetTwitterPage(uName string) TwitterPage {
 	}
 	fmt.Println(Posts)
 	sort.Sort(Posts)
-	fmt.Println("Type ------>", reflect.TypeOf(Posts))
 	newPosts := GetContents(Posts)
 	// Remove the user itself from following list (just not shown in screen but in memory)
 	Following = Deletes(Following, uName)
-	fmt.Println("-------->", Posts)
 	pg := TwitterPage{UserName: UserName, Following: Following, UnFollowed: UnFollowed, Posts: newPosts}
 	return pg
 }
