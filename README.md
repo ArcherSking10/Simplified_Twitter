@@ -46,6 +46,6 @@ It is divided into three parts:
 ```
 
 ## Team
-- Site Li
-- Kuang Sheng
-- Xinyu Ma
+- Site Li (sl6890)
+- Kuang Sheng (ks4504, but not enrolled)
+- Xinyu Ma (xm546)
