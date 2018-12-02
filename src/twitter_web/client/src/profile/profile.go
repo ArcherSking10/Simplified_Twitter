@@ -14,7 +14,7 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 	uName := cookie.GetUserName(r)
 	if uName != "" {
 		// fmt.Println("----------------> Test rpc Start")
-		curUser := rpcFunction.RpcGetUser(uName).Userinfo
+		curUser := rpcFunction.RpcGetUser(uName)
 		// fmt.Println("----------------> Test rpc End")
 		fmt.Println("Username", curUser.UserName)
 		switch r.Method {

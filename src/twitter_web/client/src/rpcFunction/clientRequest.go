@@ -14,7 +14,7 @@ const (
 	// defaultName = "world"
 )
 
-func RpcGetUser(uName string) *pb.GetUserReply {
+func RpcGetUser(uName string) storage.User {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -26,12 +26,14 @@ func RpcGetUser(uName string) *pb.GetUserReply {
 	r, err := c.GetUser(ctx, &pb.GetUserRequest{Uname: uName})
 	if err != nil {
 		log.Printf("failed to call: %v", err)
-		return nil
+		// return nil
 	}
-	return r
+	user := r.Userinfo
+	tmp := storage.PbTypeTo(user)
+	return tmp
 }
 
-func RpcUpdateUser(uName string, usr *pb.User) bool {
+func RpcUpdateUser(uName string, usr storage.User) bool {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -40,7 +42,8 @@ func RpcUpdateUser(uName string, usr *pb.User) bool {
 	c := pb.NewWebClient(conn)
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
-	r, err := c.UpdateUser(ctx, &pb.UpdateUserRequest{Username: uName, Usr: usr})
+	pbUser := storage.ToPbType(usr)
+	r, err := c.UpdateUser(ctx, &pb.UpdateUserRequest{Username: uName, Usr: pbUser})
 	return r.T
 }
 

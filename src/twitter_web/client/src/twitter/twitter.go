@@ -3,10 +3,11 @@ package twitter
 import (
 	"auth/cookie"
 	"fmt"
-	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
+	// pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
 	"html/template"
 	"net/http"
 	"rpcFunction"
+	"storage"
 	"time"
 )
 
@@ -14,7 +15,7 @@ func Twitter(w http.ResponseWriter, r *http.Request) {
 	uName := cookie.GetUserName(r)
 	if uName != "" {
 		fmt.Println("----------------> Test rpc Start")
-		curUser := rpcFunction.RpcGetUser(uName).Userinfo
+		curUser := rpcFunction.RpcGetUser(uName)
 		fmt.Println("----------------> Test rpc End")
 		switch r.Method {
 		case "GET":
@@ -26,17 +27,15 @@ func Twitter(w http.ResponseWriter, r *http.Request) {
 			t.Execute(w, curUser)
 		case "POST":
 			r.ParseForm()
-			var curTwit = &pb.TwitPosts{}
+			var curTwit = storage.TwitPosts{}
 			curTwit.Contents = r.Form.Get("contents")
 			// // If the post contents are empty not post
 			if curTwit.Contents != "" {
 				curTwit.Date = time.Now().Unix()
 				curTwit.User = uName
 				curUser.Posts = append(curUser.Posts, curTwit) // TODO
-				// Update the infomation in storage
-				// storage.WebDB.UpdateUser(uName, curUser)
+
 				rpcFunction.RpcUpdateUser(uName, curUser)
-				// storage.WebDB.UsersInfo[uName] = curUser
 				fmt.Println("Posts", curUser.Posts)
 			}
 			http.Redirect(w, r, "/profile", 302)
