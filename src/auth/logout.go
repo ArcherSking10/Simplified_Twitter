@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"auth/cookie"
+	"Simplified_Twitter/src/auth/cookie"
 	// "auth/storage"
 	// "fmt"
 	// "html/template"

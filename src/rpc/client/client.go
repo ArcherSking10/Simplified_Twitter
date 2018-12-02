@@ -1,11 +1,11 @@
-package rpcFunction
+package client
 
 import (
 	"context"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
+	pb "Simplified_Twitter/src/rpc/proto"
 	"log"
-	"storage"
+	"Simplified_Twitter/src/storage"
 	"time"
 )
 
@@ -101,7 +101,7 @@ func RpcFollowUser(uName string, person string) bool {
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	r, err := c.FollowUser(ctx, &pb.FollowUserRequest{Username: uName, Othername: person})
-	log.Printf("......follow user", r.T)
+	// log.Printf("......follow user", r.T)
 	return r.T
 }
 
@@ -115,6 +115,6 @@ func RpcUnFollowUser(uName string, person string) bool {
 
 	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	r, err := c.UnFollowUser(ctx, &pb.FollowUserRequest{Username: uName, Othername: person})
-	log.Printf("......unfollow user", r.T)
+	// log.Printf("......unfollow user", r.T)
 	return r.T
 }

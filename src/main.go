@@ -1,10 +1,10 @@
 package main
 
 import (
-	"auth"
+	"Simplified_Twitter/src/auth"
 	"net/http"
-	"profile"
-	"twitter"
+	"Simplified_Twitter/src/profile"
+	"Simplified_Twitter/src/twitter"
 )
 
 func main() {

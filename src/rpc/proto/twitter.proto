@@ -4,7 +4,7 @@ option java_multiple_files = true;
 option java_package = "io.grpc.examples.twitter_web";
 option java_outer_classname = "TwitterPageProto";
 
-package TwitterPage;
+package proto;
 
 service Web{
 	

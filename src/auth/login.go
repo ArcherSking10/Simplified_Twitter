@@ -1,18 +1,18 @@
 package auth
 
 import (
-	"auth/cookie"
+	"Simplified_Twitter/src/auth/cookie"
 	"fmt"
 	"html/template"
 	"net/http"
-	"rpcFunction"
+	"Simplified_Twitter/src/rpc/client"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("method : ", r.Method)
 	switch r.Method {
 	case "GET":
-		t, err := template.ParseFiles("./template/index.html")
+		t, err := template.ParseFiles("./src/template/index.html")
 		if err != nil {
 			fmt.Fprintf(w, "Error : %v\n", err)
 			return
@@ -31,7 +31,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			pWord1 := r.Form.Get("password1")
 			pWord2 := r.Form.Get("password2")
 			// Check registeration is valid or not
-			if ok := rpcFunction.RpcAddUser(uName, pWord1, pWord2); ok {
+			if ok := client.RpcAddUser(uName, pWord1, pWord2); ok {
 				fmt.Println("Register success!")
 			} else {
 				fmt.Println("Register failed!")
@@ -39,7 +39,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		case "Login":
 			pWord := r.Form.Get("password")
 			// Check login is valid or not
-			if ok := rpcFunction.RpcHasUser(uName, pWord); ok {
+			if ok := client.RpcHasUser(uName, pWord); ok {
 				cookie.SetSession(uName, w)
 				redirectTarget += "profile"
 			}

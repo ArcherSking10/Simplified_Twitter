@@ -1,12 +1,12 @@
 package profile
 
 import (
-	"auth/cookie"
+	"Simplified_Twitter/src/auth/cookie"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"rpcFunction"
+	"Simplified_Twitter/src/rpc/client"
 )
 
 func Profile(w http.ResponseWriter, r *http.Request) {
@@ -14,19 +14,19 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 	uName := cookie.GetUserName(r)
 	if uName != "" {
 		// fmt.Println("----------------> Test rpc Start")
-		curUser := rpcFunction.RpcGetUser(uName)
+		curUser := client.RpcGetUser(uName)
 		// fmt.Println("----------------> Test rpc End")
 		fmt.Println("Username", curUser.UserName)
 		switch r.Method {
 		case "GET":
-			t, err := template.ParseFiles("template/twitter.html")
+			t, err := template.ParseFiles("./src/template/twitter.html")
 			if err != nil {
 				fmt.Fprintf(w, "Error : %v\n", err)
 				return
 			}
 			fmt.Println("----------------> Test TwitterPage Start")
 			// pageContent := storage.WebDB.GetTwitterPage(uName)
-			pageContent := rpcFunction.RpcGetTwitterPage(uName)
+			pageContent := client.RpcGetTwitterPage(uName)
 			log.Printf("........pagecontent1", pageContent.UserName)
 			log.Printf("........pagecontent2", pageContent.Following)
 			log.Printf("........pagecontent3", pageContent.UnFollowed)
@@ -42,11 +42,11 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 			case "follow":
 				person := r.Form.Get("unfollow")
 				// storage.WebDB.FollowUser(uName, person)
-				rpcFunction.RpcFollowUser(uName, person)
+				client.RpcFollowUser(uName, person)
 			case "unfollow":
 				person := r.Form.Get("following")
 				// storage.WebDB.UnFollowUser(uName, person)
-				rpcFunction.RpcUnFollowUser(uName, person)
+				client.RpcUnFollowUser(uName, person)
 			case "twit":
 				redirectUrl += "/post"
 			case "logout":

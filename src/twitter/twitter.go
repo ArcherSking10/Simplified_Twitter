@@ -1,13 +1,13 @@
 package twitter
 
 import (
-	"auth/cookie"
+	"Simplified_Twitter/src/auth/cookie"
 	"fmt"
 	// pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
 	"html/template"
 	"net/http"
-	"rpcFunction"
-	"storage"
+	"Simplified_Twitter/src/rpc/client"
+	"Simplified_Twitter/src/storage"
 	"time"
 )
 
@@ -15,11 +15,11 @@ func Twitter(w http.ResponseWriter, r *http.Request) {
 	uName := cookie.GetUserName(r)
 	if uName != "" {
 		fmt.Println("----------------> Test rpc Start")
-		curUser := rpcFunction.RpcGetUser(uName)
+		curUser := client.RpcGetUser(uName)
 		fmt.Println("----------------> Test rpc End")
 		switch r.Method {
 		case "GET":
-			t, err := template.ParseFiles("template/post.html")
+			t, err := template.ParseFiles("./src/template/post.html")
 			if err != nil {
 				fmt.Fprintf(w, "Error : %v\n", err)
 				return
@@ -35,7 +35,7 @@ func Twitter(w http.ResponseWriter, r *http.Request) {
 				curTwit.User = uName
 				curUser.Posts = append(curUser.Posts, curTwit) // TODO
 
-				rpcFunction.RpcUpdateUser(uName, curUser)
+				client.RpcUpdateUser(uName, curUser)
 				fmt.Println("Posts", curUser.Posts)
 			}
 			http.Redirect(w, r, "/profile", 302)

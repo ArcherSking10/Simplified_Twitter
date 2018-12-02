@@ -1,7 +1,7 @@
 package storage
 
 import (
-	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
+	pb "Simplified_Twitter/src/rpc/proto"
 	"sort"
 )
 

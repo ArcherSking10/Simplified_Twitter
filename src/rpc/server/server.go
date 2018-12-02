@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
+	pb "Simplified_Twitter/src/rpc/proto"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
-	"storage"
+	"Simplified_Twitter/src/storage"
 	"sync"
 )
 
@@ -56,7 +56,9 @@ func (db *DB) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) (*pb.Boo
 	defer db.mu.Unlock()
 	uName := in.Username
 	usr := storage.PbTypeTo(in.Usr)
-
+	if uName != usr.UserName {
+		return &pb.BoolReply{T: false}, nil
+	}
 	if _, ok := db.UsersInfo[uName]; ok != true {
 		return &pb.BoolReply{T: false}, nil
 	}
