@@ -1,11 +1,10 @@
 package main
 
 import (
-	// "fmt"
 	"auth"
+	"net/http"
 	"profile"
 	"twitter"
-	"net/http"
 )
 
 func main() {

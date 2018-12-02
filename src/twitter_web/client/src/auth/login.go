@@ -2,10 +2,10 @@ package auth
 
 import (
 	"auth/cookie"
-	"storage"
 	"fmt"
 	"html/template"
 	"net/http"
+	"rpcFunction"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +31,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			pWord1 := r.Form.Get("password1")
 			pWord2 := r.Form.Get("password2")
 			// Check registeration is valid or not
-			if ok := storage.WebDB.AddUser(uName, pWord1, pWord2); ok {
+			if ok := rpcFunction.RpcAddUser(uName, pWord1, pWord2); ok {
 				fmt.Println("Register success!")
 			} else {
 				fmt.Println("Register failed!")
@@ -39,7 +39,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		case "Login":
 			pWord := r.Form.Get("password")
 			// Check login is valid or not
-			if ok := storage.WebDB.HasUser(uName, pWord); ok {
+			if ok := rpcFunction.RpcHasUser(uName, pWord); ok {
 				cookie.SetSession(uName, w)
 				redirectTarget += "profile"
 			}
