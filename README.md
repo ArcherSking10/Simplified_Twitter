@@ -5,7 +5,7 @@ This a simplified version of twitter.
 It is a academic project built for 2018 fall distributed system course.
 It is divided into three parts:
 - [x] Build simple web application with database in memory
-- [ ] Split off backend into a seperate service
+- [x] Split off backend into a seperate service
 - [ ] Bind the service with a distributed system
 
 ## Main Features
@@ -15,29 +15,28 @@ It is divided into three parts:
 - View Posts from Followees and Myself 
 
 ## Instructions To Run
-**1. Install thrid-party packages**   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*go get github.com/gorilla/securecookie*  
-**2. Clone the project into "/your/path"**  
+**1. Clone the project into "/your/path"**  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*git clone ...*   
-**3. Go into the src directory and run it**  
+**2. Go into the src directory and run it**  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*cd /your/path/src*  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*go run main.go*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*go run src/server/server.go*  --> set up rpc server  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*go run src/main.go*           --> set up web server  
 
 ## Project Structure
 ```bash
 ├── README.md
 └── src
-    ├── main.go    // go run main.go
+    ├── main.go
     ├── auth       // "login & logout" module
-    │   ├── cookie
-    │   │   └── cookie.go
-    │   └── *.go
+    │   └── cookie
     ├── profile    // "presonal profile" module
-    │   └── *.go
     ├── twitter    // "twitter page" module
-    │   └── *.go
-    ├── storage    // database , its functions and test
-    │   └── *.go
+    ├── storage    // definition of various struct
+    ├── rpc        // gRPC module
+    │   ├── client
+    │   ├── server
+    │   └── proto
+    ├── vendor     // dependencies
     └── template   // html and css templates
         ├── *.html
         └── static
@@ -48,4 +47,3 @@ It is divided into three parts:
 ## Team
 - Site Li (sl6890)
 - Kuang Sheng (ks4504, but not enrolled)
-- Xinyu Ma (xm546)
