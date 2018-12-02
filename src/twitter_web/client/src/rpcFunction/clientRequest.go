@@ -3,7 +3,7 @@ package rpcFunction
 import (
 	"context"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/twitter_web/TwitterPage"
+	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
 	"log"
 	"storage"
 	"time"

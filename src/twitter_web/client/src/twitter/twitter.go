@@ -3,7 +3,7 @@ package twitter
 import (
 	"auth/cookie"
 	"fmt"
-	pb "google.golang.org/grpc/examples/twitter_web/TwitterPage"
+	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
 	"html/template"
 	"net/http"
 	"rpcFunction"

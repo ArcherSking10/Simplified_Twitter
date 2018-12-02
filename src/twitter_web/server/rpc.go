@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/twitter_web/TwitterPage"
+	pb "google.golang.org/grpc/examples/Simplified_Twitter/src/twitter_web/TwitterPage"
 	"google.golang.org/grpc/reflection"
 	"sort"
 	"sync"
