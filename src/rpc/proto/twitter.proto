@@ -22,7 +22,9 @@ service Web{
 
 	rpc UnFollowUser(FollowUserRequest) returns (BoolReply){}
 
+	rpc IsLeader(IsLeaderRequest) returns (BoolReply){}
 
+	rpc Join(JoinRequest) returns (BoolReply){}
 }
 
 message AddUserRequest{
@@ -84,4 +86,12 @@ message GetTwitterPageReply{
 message FollowUserRequest{
 	string username = 1;
 	string othername = 2;
+}
+
+message IsLeaderRequest{
+	string address = 1;
+}
+message JoinRequest{
+	string nodeID = 1;
+	string remoteAddr = 2;
 }

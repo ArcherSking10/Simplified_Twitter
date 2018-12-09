@@ -1,177 +1,99 @@
 package main
 
 import (
-	"context"
-	"google.golang.org/grpc"
 	pb "Simplified_Twitter/src/rpc/proto"
+	"Simplified_Twitter/src/rpc/server/serverDB"
+	"Simplified_Twitter/src/storage"
+	"bytes"
+	// "context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	// "github.com/hashicorp/raft"
+	// "github.com/hashicorp/raft-boltdb"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	// "io"
 	"log"
 	"net"
-	"Simplified_Twitter/src/storage"
-	"sync"
+	"net/http"
+	"os"
+	// "path/filepath"
+	// "sync"
+	// "time"
 )
 
-const (
-	port = ":9091"
-)
+var port = ":9091"
+var storageDir string
+var rpcPort string
+var raftPort string
+var nodeName string
 
-type DB struct {
-	mu        sync.Mutex
-	UsersInfo map[string]storage.User
+func join(nodeID, raftAddr string) error {
+	b, err := json.Marshal(map[string]string{"addr": raftAddr, "id": nodeID})
+	if err != nil {
+		return err
+	}
+	log.Println("-------> Enter join")
+	// http.Post(request_url, "application/x-www-form-urlencoded", body)
+	resp, err := http.Post(fmt.Sprintf("http://:9090/join"), "application-type/json", bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	log.Println("======")
+	defer resp.Body.Close()
+
+	return nil
 }
 
-func (db *DB) GetUser(ctx context.Context, in *pb.GetUserRequest) (*pb.GetUserReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	var uName string = in.Uname
-	var tmp storage.User = db.UsersInfo[uName]
-	user := storage.ToPbType(tmp)
-	// log.Printf("------> server user", user)
-	return &pb.GetUserReply{Userinfo: user}, nil
+func init() {
+	flag.StringVar(&storageDir, "storageDir", "/tmp/dir1", "Set the storage directory")
+	flag.StringVar(&rpcPort, "rpcPort", "9090", "Set Rpc bind address")
+	flag.StringVar(&raftPort, "raftPort", "9091", "Set Raft bind address")
+	flag.StringVar(&nodeName, "nodeName", "node0", "Set the name of server")
+	flag.Usage = func() {
+		fmt.Println("Usage: go run server.go [options] <data-path>")
+		flag.PrintDefaults()
+	}
 }
 
-func (db *DB) AddUser(ctx context.Context, in *pb.AddUserRequest) (*pb.BoolReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	pWord1 := in.Password1
-	pWord2 := in.Password2
-	if pWord1 != pWord2 {
-		return &pb.BoolReply{T: false}, nil
+func New() *serverDB.DB {
+	fmt.Println(storageDir)
+	fmt.Println(rpcPort)
+	fmt.Println(raftPort)
+	fmt.Println(nodeName)
+	WebDB := &serverDB.DB{
+		Inmem:     false,
+		RaftDir:   storageDir,
+		RaftBind:  raftPort,
+		Logger:    log.New(os.Stderr, "[store1] ", log.LstdFlags),
+		UsersInfo: make(map[string]storage.User),
 	}
-	if uName == "" || pWord1 == "" {
-		return &pb.BoolReply{T: false}, nil
-	}
-	curUser := storage.User{uName, pWord1, storage.Twitlist{}, []string{uName}}
-	if _, ok := db.UsersInfo[uName]; ok {
-		return &pb.BoolReply{T: false}, nil
-	}
-	// Use uName as key put curUser inside
-	db.UsersInfo[uName] = curUser
-	return &pb.BoolReply{T: true}, nil
+	return WebDB
 }
-
-func (db *DB) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) (*pb.BoolReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	usr := storage.PbTypeTo(in.Usr)
-	if uName != usr.UserName {
-		return &pb.BoolReply{T: false}, nil
-	}
-	if _, ok := db.UsersInfo[uName]; ok != true {
-		return &pb.BoolReply{T: false}, nil
-	}
-	db.UsersInfo[uName] = usr
-	return &pb.BoolReply{T: true}, nil
-}
-
-func (db *DB) HasUser(ctx context.Context, in *pb.HasUserRequest) (*pb.BoolReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	pWord := in.Password
-	if uName == "" || pWord == "" {
-		return &pb.BoolReply{T: false}, nil
-	}
-	// Check Whether User in usersInfo
-	user, exist := db.UsersInfo[uName]
-	if exist && user.PassWord == pWord {
-		return &pb.BoolReply{T: true}, nil
-	}
-	return &pb.BoolReply{T: false}, nil
-}
-
-func (db *DB) FollowUser(ctx context.Context, in *pb.FollowUserRequest) (*pb.BoolReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	otherName := in.Othername
-	if user, ok := db.UsersInfo[uName]; ok {
-		if storage.Contains(user.Following, otherName) {
-			return &pb.BoolReply{T: false}, nil
-		}
-		user.Following = append(user.Following, otherName)
-		db.UsersInfo[uName] = user
-		return &pb.BoolReply{T: true}, nil
-	}
-	return &pb.BoolReply{T: false}, nil
-}
-
-func (db *DB) UnFollowUser(ctx context.Context, in *pb.FollowUserRequest) (*pb.BoolReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	otherName := in.Othername
-	if user, ok := db.UsersInfo[uName]; ok {
-		if !storage.Contains(user.Following, otherName) {
-			return &pb.BoolReply{T: false}, nil
-		}
-		user.Following = storage.Deletes(user.Following, otherName)
-		db.UsersInfo[uName] = user
-		return &pb.BoolReply{T: true}, nil
-	}
-	return &pb.BoolReply{T: false}, nil
-}
-
-// // Get Rid of the arrtribute of time
-// // Just leave username + contents
-
-func GetContents(arr storage.Twitlist) []string {
-	var ret []string
-	for _, twit := range arr {
-		tmp := twit.User + ": " + twit.Contents
-		ret = append(ret, tmp)
-	}
-	return ret
-}
-
-func (db *DB) GetTwitterPage(ctx context.Context, in *pb.GetTwitterPageRequest) (*pb.GetTwitterPageReply, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-	uName := in.Username
-	user, _ := db.UsersInfo[uName]
-	log.Printf("-------> TwitterPage Userinfo ", user)
-	UserName := user.UserName
-	Following := user.Following
-	log.Printf("..............", Following)
-	var UnFollowed []string
-	var Posts storage.Twitlist
-	// Get all Posts information
-	for name, userInfo := range db.UsersInfo {
-		if storage.Contains(Following, name) {
-			for _, post := range userInfo.Posts {
-				Posts = append(Posts, post)
-			}
-		} else {
-			UnFollowed = append(UnFollowed, name)
-		}
-	}
-	Posts = storage.Sort(Posts)
-	newPosts := storage.GetContents(Posts)
-	// Remove the user itself from following list (just not shown in screen but in memory)
-	Following = storage.Deletes(Following, uName)
-	log.Printf("------> TwitterPage Username %s", UserName)
-	log.Printf("------> TwitterPage Following %s", Following)
-	log.Printf("------> TwitterPage UnFollowed %s", UnFollowed)
-	log.Printf("------> TwitterPage Posts %s", newPosts)
-	var twit = &pb.TwitterPage{Username: UserName, UnFollowed: UnFollowed, Following: Following, Posts: newPosts}
-	return &pb.GetTwitterPageReply{Twit: twit}, nil
-
-}
-
-func main() {
+func connectRpc() (*grpc.Server, net.Listener) {
+	flag.Parse()
+	port = rpcPort
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	WebDB := &DB{}
-	WebDB.UsersInfo = make(map[string]storage.User)
+	return s, lis
+}
+
+func main() {
+	s, lis := connectRpc()
+	WebDB := New()
+	joinAddr := ""
+	if err := WebDB.Open(joinAddr == "", "node1"); err != nil {
+		log.Fatalf("failed to open store: %s", err.Error())
+	}
 	pb.RegisterWebServer(s, WebDB)
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
