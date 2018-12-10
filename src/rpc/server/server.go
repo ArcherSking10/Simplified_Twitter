@@ -20,7 +20,7 @@ import (
 	"os"
 	// "path/filepath"
 	// "sync"
-	// "time"
+	"time"
 )
 
 var port = ":9091"
@@ -28,6 +28,7 @@ var storageDir string
 var rpcPort string
 var raftPort string
 var nodeName string
+var isLeader bool
 
 func join(nodeID, raftAddr string) error {
 	b, err := json.Marshal(map[string]string{"addr": raftAddr, "id": nodeID})
@@ -51,6 +52,7 @@ func init() {
 	flag.StringVar(&rpcPort, "rpcPort", "9090", "Set Rpc bind address")
 	flag.StringVar(&raftPort, "raftPort", "9091", "Set Raft bind address")
 	flag.StringVar(&nodeName, "nodeName", "node0", "Set the name of server")
+	flag.BoolVar(&isLeader, "isLeader", false, "node is leader or not")
 	flag.Usage = func() {
 		fmt.Println("Usage: go run server.go [options] <data-path>")
 		flag.PrintDefaults()
@@ -66,13 +68,12 @@ func New() *serverDB.DB {
 		Inmem:     false,
 		RaftDir:   storageDir,
 		RaftBind:  raftPort,
-		Logger:    log.New(os.Stderr, "[store1] ", log.LstdFlags),
+		Logger:    log.New(os.Stderr, "[store2] ", log.LstdFlags),
 		UsersInfo: make(map[string]storage.User),
 	}
 	return WebDB
 }
 func connectRpc() (*grpc.Server, net.Listener) {
-	flag.Parse()
 	port = rpcPort
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -82,12 +83,20 @@ func connectRpc() (*grpc.Server, net.Listener) {
 	return s, lis
 }
 func main() {
+	flag.Parse()
 	s, lis := connectRpc()
 	WebDB := New()
-	joinAddr := ""
-	if err := WebDB.Open(joinAddr == "", "node1"); err != nil {
+	log.Println("------->", isLeader)
+	if err := WebDB.Open(isLeader, nodeName); err != nil {
 		log.Fatalf("failed to open store: %s", err.Error())
 	}
+
+	time.Sleep(5 * time.Second)
+	log.Println("------->", isLeader)
+	if !isLeader {
+		join(nodeName, raftPort)
+	}
+
 	pb.RegisterWebServer(s, WebDB)
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

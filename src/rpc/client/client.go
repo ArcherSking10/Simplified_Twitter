@@ -12,14 +12,17 @@ import (
 )
 
 var curLeader int = -1
+var idx int
 var addresslist = []string{"localhost:9091", "localhost:9092", "localhost:9093"}
 
 func RpcEstablish(addresslist []string) (*grpc.ClientConn, pb.WebClient) {
-	// a = append(a, b...)
-	if curLeader != -1 {
-		addresslist = append(addresslist[curLeader+1:], addresslist[:curLeader]...)
+	if curLeader == -1 {
+		idx = 0
+	} else {
+		idx = curLeader
 	}
-	for idx, address := range addresslist {
+	for idx < len(addresslist) {
+		address := addresslist[idx]
 		conn, err := grpc.Dial(address, grpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("did not connect: %v", err)
@@ -34,44 +37,22 @@ func RpcEstablish(addresslist []string) (*grpc.ClientConn, pb.WebClient) {
 		t, err := c.IsLeader(ctx, add)
 		log.Println("--------> T", t)
 		log.Println("--------> err", err)
-		if err == nil {
-			if t.T {
-				return conn, c
-			}
-		} else {
+		log.Println("------> sssssssssssss", idx)
+		if err == nil && t.T {
+			log.Println("------> Leader", idx)
 			curLeader = idx
+			return conn, c
+		} else {
+			idx += 1
+			if idx == len(addresslist) {
+				idx = 0
+			}
 		}
 		conn.Close()
 	}
 	log.Println("----> pointer")
 	return nil, nil
 }
-
-// func RpcEstablish(addresslist []string) (*grpc.ClientConn, pb.WebClient) {
-// 	for _, address := range addresslist {
-// 		conn, err := grpc.Dial(address, grpc.WithInsecure())
-// 		if err != nil {
-// 			log.Fatalf("did not connect: %v", err)
-// 		}
-// 		c := pb.NewWebClient(conn)
-// 		ctx, _ := context.WithTimeout(context.Background(), time.Second)
-// 		log.Println("---------> 6666666", c)
-// 		log.Println("-----> sssss")
-// 		port := strings.Split(address, ":")[1]
-// 		fmt.Println(port)
-// 		var add = &pb.IsLeaderRequest{Address: port}
-// 		t, err := c.IsLeader(ctx, add)
-// 		log.Println("--------> T", t)
-// 		log.Println("--------> err", err)
-// 		if err == nil && t.T {
-// 			curLeader =
-// 			return conn, c
-// 		}
-// 		conn.Close()
-// 	}
-// 	log.Println("----> pointer")
-// 	return nil, nil
-// }
 
 func RpcGetUser(uName string) storage.User {
 	conn, c := RpcEstablish(addresslist)

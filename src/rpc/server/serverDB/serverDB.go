@@ -211,42 +211,52 @@ func (s *DB) Join(ctx context.Context, in *pb.JoinRequest) (*pb.BoolReply, error
 
 func (s *DB) Open(enableSingle bool, localID string) error {
 	// Setup Raft configuration.
+	log.Println("-----------> Open")
 	config := raft.DefaultConfig()
 	config.LocalID = raft.ServerID(localID)
 
 	// Setup Raft communication.
+	log.Println("-------> Setup", s.RaftBind)
 	addr, err := net.ResolveTCPAddr("tcp", s.RaftBind)
 	if err != nil {
 		return err
 	}
+	log.Println("-------------> transport")
 	transport, err := raft.NewTCPTransport(s.RaftBind, addr, 3, 10*time.Second, os.Stderr)
 	if err != nil {
 		return err
 	}
 	// Create the snapshot store. This allows the Raft to truncate the log.
+	log.Println("-------> snapshot")
 	snapshots, err := raft.NewFileSnapshotStore(s.RaftDir, 2, os.Stderr)
 	if err != nil {
 		return fmt.Errorf("file snapshot store: %s", err)
 	}
 	// Create the log store and stable store.
+	log.Println("-----> store")
 	var logStore raft.LogStore
 	var stableStore raft.StableStore
 	if s.Inmem {
 		logStore = raft.NewInmemStore()
 		stableStore = raft.NewInmemStore()
 	} else {
+		log.Println("------> store Enter")
 		boltDB, err := raftboltdb.NewBoltStore(filepath.Join(s.RaftDir, "raft.db"))
+		log.Println("----------> store Exit")
 		if err != nil {
+			log.Println("------> err", err)
 			return fmt.Errorf("new bolt store: %s", err)
 		}
 		logStore = boltDB
 		stableStore = boltDB
 	}
+	log.Println("----------> Start")
 	// Instantiate the Raft systems.
 	ra, err := raft.NewRaft(config, (*fsm)(s), logStore, stableStore, snapshots, transport)
 	if err != nil {
 		return fmt.Errorf("new raft: %s", err)
 	}
+	log.Println("-------> end")
 	s.Raft = ra
 	if enableSingle {
 		configuration := raft.Configuration{
@@ -259,6 +269,7 @@ func (s *DB) Open(enableSingle bool, localID string) error {
 		}
 		ra.BootstrapCluster(configuration)
 	}
+
 	return nil
 }
 
