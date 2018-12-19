@@ -1,42 +1,42 @@
 [submodule "src/src/vendor/github.com/fatih/color"]
 	path = src/src/vendor/github.com/fatih/color
-	url = git@github.com:fatih/color.git
+	url = https://github.com/fatih/color
 [submodule "src/vendor/github.com/boltdb/bolt"]
 	path = src/vendor/github.com/boltdb/bolt
-	url = git@github.com:boltdb/bolt.git
+	url = https://github.com/boltdb/bolt
 [submodule "src/vendor/github.com/armon/go-metrics"]
 	path = src/vendor/github.com/armon/go-metrics
-	url = git@github.com:armon/go-metrics.git
+	url = https://github.com/armon/go-metrics
 [submodule "src/vendor/github.com/gogo/protobuf"]
 	path = src/vendor/github.com/gogo/protobuf
-	url = git@github.com:gogo/protobuf.git
+	url = https://github.com/gogo/protobuf
 [submodule "src/vendor/github.com/golang/protobuf"]
 	path = src/vendor/github.com/golang/protobuf
-	url = git@github.com:golang/protobuf.git
+	url = https://github.com/golang/protobuf
 [submodule "src/vendor/github.com/gorilla/securecookie"]
 	path = src/vendor/github.com/gorilla/securecookie
-	url = git@github.com:gorilla/securecookie.git
+	url = https://github.com/gorilla/securecookie
 [submodule "src/vendor/github.com/gorilla/mux"]
 	path = src/vendor/github.com/gorilla/mux
-	url = git@github.com:gorilla/mux.git
+	url = https://github.com/gorilla/mux
 [submodule "src/vendor/github.com/hashicorp/go-immutable-radix"]
 	path = src/vendor/github.com/hashicorp/go-immutable-radix
-	url = git@github.com:hashicorp/go-immutable-radix.git
+	url = https://github.com/hashicorp/go-immutable-radix
 [submodule "src/vendor/github.com/hashicorp/go-msgpack"]
 	path = src/vendor/github.com/hashicorp/go-msgpack
-	url = git@github.com:hashicorp/go-msgpack.git
+	url = https://github.com/hashicorp/go-msgpack
 [submodule "src/vendor/github.com/hashicorp/golang-lru"]
 	path = src/vendor/github.com/hashicorp/golang-lru
-	url = git@github.com:hashicorp/golang-lru.git
+	url = https://github.com/hashicorp/golang-lru
 [submodule "src/vendor/github.com/hashicorp/raft"]
 	path = src/vendor/github.com/hashicorp/raft
-	url = git@github.com:hashicorp/raft.git
+	url = https://github.com/hashicorp/raft
 [submodule "src/vendor/github.com/hashicorp/raft-boltdb"]
 	path = src/vendor/github.com/hashicorp/raft-boltdb
-	url = git@github.com:hashicorp/raft-boltdb.git
+	url = https://github.com/hashicorp/raft-boltdb
 [submodule "src/vendor/google.golang.org/genproto"]
 	path = src/vendor/google.golang.org/genproto
-	url = git@github.com:google/go-genproto.git
+	url = https://github.com/google/go-genproto
 [submodule "src/vendor/google.golang.org/grpc"]
 	path = src/vendor/google.golang.org/grpc
-	url = git@github.com:grpc/grpc-go.git
+	url = https://github.com/grpc/grpc-go
