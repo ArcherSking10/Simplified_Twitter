@@ -48,6 +48,10 @@ It is divided into three parts:
     └── template           // html and css templates
 ```
 
+## Demo  
+<img src="https://github.com/Distributed-System-Team/Simplified_Twitter/blob/master/demo/login.png" width="400" height="200"/> <img src="https://github.com/Distributed-System-Team/Simplified_Twitter/blob/master/demo/profile.png" width="400" height="200" />
+<img src="https://github.com/Distributed-System-Team/Simplified_Twitter/blob/master/demo/twit.png" width="400" height="200"/><img src="https://github.com/Distributed-System-Team/Simplified_Twitter/blob/master/demo/terminal.png" width="400" height="200"/>
+
 ## Team
 - Site Li (sl6890)
 - Xinyu Ma (xm546)
