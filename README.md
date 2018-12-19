@@ -17,7 +17,8 @@ It is divided into three parts:
 ## Instructions To Run
 **1. Clone the project**  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*git clone ...*   
-**2. Download dependencies...**  
+**2. Download dependencies**  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*git submodule update --init --recursive*  
 **3. Start http server**  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*go run src/main.go*  
 **4. Start raft server**  
