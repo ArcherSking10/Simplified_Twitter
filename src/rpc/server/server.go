@@ -20,7 +20,7 @@ import (
 	"os"
 	// "path/filepath"
 	// "sync"
-	"time"
+	// "time"
 )
 
 var port = ":9091"
@@ -91,7 +91,7 @@ func main() {
 		log.Fatalf("failed to open store: %s", err.Error())
 	}
 
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 	log.Println("------->", isLeader)
 	if !isLeader {
 		join(nodeName, raftPort)
